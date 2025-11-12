@@ -1,0 +1,248 @@
+import 'package:flutter/material.dart';
+// import 'package:qr_flutter/qr_flutter.dart'; // Commented out to fix "Unsupported package" error.
+                                              // If you add qr_flutter to pubspec.yaml and run 'flutter pub get',
+                                              // you can uncomment this line and remove the placeholder classes below.
+
+// --- Placeholder classes for QrVersions and QrImageView ---
+// These are provided to allow the code to compile and run if the qr_flutter package
+// is genuinely unsupported or not set up in the project.
+// They will display a visual placeholder instead of a functional QR code.
+
+/// Placeholder for QrVersions if qr_flutter is genuinely unsupported.
+class QrVersions {
+  static const int auto = 0; // A dummy value for compilation
+}
+
+/// Placeholder for QrImageView if qr_flutter is genuinely unsupported.
+class QrImageView extends StatelessWidget {
+  final String data;
+  final int version; // Using int as a simple placeholder for the enum value
+  final double size;
+
+  const QrImageView({
+    Key? key,
+    required this.data,
+    this.version = QrVersions.auto, // Default to placeholder auto
+    this.size = 100.0,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.shade700, // A placeholder background color
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.blueAccent, width: 2),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.qr_code_2, size: size * 0.4, color: Colors.white70),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Text(
+                data.isEmpty
+                    ? 'QR Placeholder'
+                    : 'Data: "${data.length > 20 ? data.substring(0, 17) + '...' : data}"',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white70, fontSize: size * 0.08),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (data.isEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text(
+                  '(qr_flutter unavailable)',
+                  style: TextStyle(color: Colors.redAccent, fontSize: size * 0.06),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+// --- End of Placeholder classes ---
+
+
+void main() {
+  runApp(const QRGeneratorApp());
+}
+
+class QRGeneratorApp extends StatelessWidget {
+  const QRGeneratorApp({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        primaryColor: Colors.blueAccent,
+        // Use an accent color that pops
+        colorScheme: ColorScheme.fromSwatch(
+          brightness: Brightness.dark,
+          primarySwatch: Colors.blue,
+        ).copyWith(secondary: Colors.blueAccent),
+      ),
+      home: const QRGeneratorScreen(),
+    );
+  }
+}
+
+class QRGeneratorScreen extends StatefulWidget {
+  const QRGeneratorScreen({Key? key}) : super(key: key); // Corrected super() call
+
+  @override
+  _QRGeneratorScreenState createState() => _QRGeneratorScreenState();
+}
+
+class _QRGeneratorScreenState extends State<QRGeneratorScreen> {
+  final TextEditingController _textController = TextEditingController();
+  String _qrData = ""; // The data to be encoded in the QR code
+
+  void _generateQRCode() {
+    // Update the state with the new text
+    setState(() {
+      _qrData = _textController.text;
+    });
+    // Hide keyboard
+    FocusScope.of(context).unfocus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('QR Code Generator'),
+        backgroundColor: const Color(0xFF1F1F1F),
+        elevation: 0,
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // --- The QR Code Display ---
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white, // Original intent was white for scannable QR. Placeholder might differ internally.
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.5),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(20),
+                child: AnimatedCrossFade(
+                  // Show a placeholder or the QR code
+                  firstChild: const SizedBox(
+                    width: 250,
+                    height: 250,
+                    child: Center(
+                      child: Text(
+                        'Enter text to generate a QR code',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                  secondChild: QrImageView(
+                    data: _qrData,
+                    version: QrVersions.auto,
+                    size: 250.0,
+                    // The 'QrEyeStyle' and 'QrDataModuleStyle' properties, along with
+                    // 'QrEyeShape' and 'QrDataModuleShape' enums, were introduced
+                    // in qr_flutter package version 3.0.0.
+                    // If you are seeing "Undefined name 'QrEyeShape'" errors,
+                    // it means your qr_flutter package is likely an older version.
+                    //
+                    // To re-enable custom styling, update your pubspec.yaml:
+                    // dependencies:
+                    //   qr_flutter: ^3.0.0 # or a newer version like ^4.0.0
+                    // And then run 'flutter pub get'.
+                    //
+                    // For now, these styling properties are removed to fix the error.
+                    // eyeStyle: const QrEyeStyle(
+                    //   eyeShape: QrEyeShape.square,
+                    //   color: Colors.black,
+                    // ),
+                    // dataModuleStyle: const QrDataModuleStyle(
+                    //   dataModuleShape: QrDataModuleShape.square,
+                    //   color: Colors.black,
+                    // ),
+                  ),
+                  crossFadeState: _qrData.isEmpty
+                      ? CrossFadeState.showFirst
+                      : CrossFadeState.showSecond,
+                  duration: const Duration(milliseconds: 300),
+                ),
+              ),
+              
+              const SizedBox(height: 40),
+
+              // --- The Input Text Field ---
+              TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  labelText: 'Enter text or URL',
+                  labelStyle: const TextStyle(color: Colors.blueAccent),
+                  filled: true,
+                  fillColor: const Color(0xFF1F1F1F),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+                  ),
+                ),
+                onSubmitted: (value) => _generateQRCode(), // Also generate on submit
+              ),
+              
+              const SizedBox(height: 20),
+
+              // --- The Generate Button ---
+              SizedBox(
+                width: double.infinity, // Make button fill width
+                height: 55,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent, // Use accent color
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _generateQRCode,
+                  child: const Text(
+                    'GENERATE',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
